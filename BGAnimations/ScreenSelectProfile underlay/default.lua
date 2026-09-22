@@ -34,12 +34,38 @@ local HandleStateChange = function(self, Player)
 
 	local seltext = frame:GetChild('SelectedProfileText')
 	local usbsprite = frame:GetChild('USBIcon')
+	local arcadepass_status = frame:GetChild('ArcadePassStatus')
 
 	if GAMESTATE:IsHumanPlayer(Player) then
 		local selected = readyPlayers[ToEnumShortString(Player)]
 		joinframe:visible(selected)
 		scrollerframe:visible(not selected)
 		seltext:visible(selected)
+
+		if PREFSMAN:GetPreference("ArcadePassEnabled") then
+			-- ArcadePass cabinets never show the local-profile scroller. The
+			-- engine only reports a profile index here after a card scan has
+			-- authorized this player, so names cannot be browsed or inferred.
+			local profile_index = SCREENMAN:GetTopScreen():GetProfileIndex(Player)
+			scrollerframe:visible(false)
+			joinframe:visible(selected)
+			seltext:visible(selected)
+			arcadepass_status:visible(not selected)
+			if profile_index > 0 then
+				local profile = PROFILEMAN:GetLocalProfileFromIndex(profile_index - 1)
+				local displayname = profile and profile:GetDisplayName() or ""
+				seltext:settext(displayname)
+				arcadepass_status:settext("ARCADEPASS ACCEPTED\n" .. displayname .. "\nPress START to continue")
+			else
+				seltext:settext(THEME:GetString("ScreenSelectProfile", "GuestProfile"))
+				if profile_index == -3 then
+					arcadepass_status:settext("PLAYING AS GUEST\nPress START to continue")
+				else
+					arcadepass_status:settext("SCAN ARCADEPASS\nor press START for guest")
+				end
+			end
+			return
+		end
 
 		if MEMCARDMAN:GetCardState(Player) == 'MemoryCardState_none' then
 			-- using local profile
@@ -58,6 +84,22 @@ local HandleStateChange = function(self, Player)
 		scrollerframe:visible(false)
 		seltext:visible(false)
 		usbsprite:visible(false)
+
+		if PREFSMAN:GetPreference("ArcadePassEnabled") then
+			-- A pass may already be authorized while this side is still
+			-- unjoined; show it without revealing any other accounts.
+			local profile_index = SCREENMAN:GetTopScreen():GetProfileIndex(Player)
+			arcadepass_status:visible(true)
+			if profile_index > 0 then
+				local profile = PROFILEMAN:GetLocalProfileFromIndex(profile_index - 1)
+				local displayname = profile and profile:GetDisplayName() or ""
+				arcadepass_status:settext("ARCADEPASS ACCEPTED\n" .. displayname .. "\nPress START to continue")
+			else
+				arcadepass_status:settext("SCAN ARCADEPASS\nor press START for guest")
+			end
+		else
+			arcadepass_status:visible(false)
+		end
 	end
 end
 
@@ -94,14 +136,22 @@ local t = Def.ActorFrame {
 			-- So, if the MenuTimer reaches 0 and both players are on the same non-GUEST profile
 			-- we'll set them both to GUEST before transitioning.
 
+			-- An ArcadePass cabinet never populates the profile scrollers, so
+			-- the focus lookup can come back nil; treat a missing entry as
+			-- [GUEST] (index 0) instead of indexing nil.
+			local info_1 = scrollers[PLAYER_1]:get_info_at_focus_pos()
+			local info_2 = scrollers[PLAYER_2]:get_info_at_focus_pos()
+			local index_1 = type(info_1)=="table" and info_1.index or 0
+			local index_2 = type(info_2)=="table" and info_2.index or 0
+
 			-- if both players have joined
 			if  #GAMESTATE:GetHumanPlayers() > 1
 			-- and both players are trying to choose the same profile
-			and scrollers[PLAYER_1]:get_info_at_focus_pos().index == scrollers[PLAYER_2]:get_info_at_focus_pos().index
+			and index_1 == index_2
 			-- and that profile they are both trying to choose isn't [GUEST]
-			and scrollers[PLAYER_1]:get_info_at_focus_pos().index ~= 0 then
-				scrollers[PLAYER_1]:scroll_by_amount( -scrollers[PLAYER_1]:get_info_at_focus_pos().index )
-				scrollers[PLAYER_2]:scroll_by_amount( -scrollers[PLAYER_2]:get_info_at_focus_pos().index )
+			and index_1 ~= 0 then
+				scrollers[PLAYER_1]:scroll_by_amount( -index_1 )
+				scrollers[PLAYER_2]:scroll_by_amount( -index_2 )
 				self:sleep(0.3)
 			end
 
@@ -123,44 +173,48 @@ local t = Def.ActorFrame {
 		self:sleep(0.5):queuecommand("Finish")
 	end,
 	FinishCommand=function(self)
-		-- Loop through the enum for PlayerNumber that the engine has exposed to Lua.
-		for player in ivalues( PlayerNumber ) do
-			-- check if this player is joined in
-			if GAMESTATE:IsHumanPlayer(player) then
-				-- this player was joined in, so get the index of their profile scroller as it is now
-				local info = scrollers[player]:get_info_at_focus_pos()
-				-- if there were no local profiles, there won't be any info
-				-- set index to 0 if so to indicate that "[Guest]" was chosen (because it was the only choice)
-				local index = type(info)=="table" and info.index or 0
+		-- In ArcadePass mode the engine already holds the only profile each
+		-- player is allowed to use. Do not let scroller indices overwrite it.
+		if not PREFSMAN:GetPreference("ArcadePassEnabled") then
+			-- Loop through the enum for PlayerNumber that the engine has exposed to Lua.
+			for player in ivalues( PlayerNumber ) do
+				-- check if this player is joined in
+				if GAMESTATE:IsHumanPlayer(player) then
+					-- this player was joined in, so get the index of their profile scroller as it is now
+					local info = scrollers[player]:get_info_at_focus_pos()
+					-- if there were no local profiles, there won't be any info
+					-- set index to 0 if so to indicate that "[Guest]" was chosen (because it was the only choice)
+					local index = type(info)=="table" and info.index or 0
 
-				-- the engine's SetProfileIndex() method expects local profiles to use index values that are > 0
-				-- it also uses the following hardcoded values:
-				--   0: use the USB memory card associated with this player
-				--  -1: join the player and play the theme's start sound effect
-				--  -2: unjoin the player, unlock their memorycard, and unmount their memorycard
-				--  -3: allow the user to play without a profile (USB or local)
+					-- the engine's SetProfileIndex() method expects local profiles to use index values that are > 0
+					-- it also uses the following hardcoded values:
+					--   0: use the USB memory card associated with this player
+					--  -1: join the player and play the theme's start sound effect
+					--  -2: unjoin the player, unlock their memorycard, and unmount their memorycard
+					--  -3: allow the user to play without a profile (USB or local)
 
-				-- check for and handle USB memorycards first
-				if MEMCARDMAN:GetCardState(player) ~= 'MemoryCardState_none' then
-					SCREENMAN:GetTopScreen():SetProfileIndex(player, 0)
+					-- check for and handle USB memorycards first
+					if MEMCARDMAN:GetCardState(player) ~= 'MemoryCardState_none' then
+						SCREENMAN:GetTopScreen():SetProfileIndex(player, 0)
 
-				-- local profile
-				elseif index > 0 then
-					SCREENMAN:GetTopScreen():SetProfileIndex(player, index)
+					-- local profile
+					elseif index > 0 then
+						SCREENMAN:GetTopScreen():SetProfileIndex(player, index)
 
-				-- 0 here is my own stupid hardcoded number, defined over in PlayerFrame.lua for use with the "[Guest]" choice
-				-- In this case, 0 is the index of the choice in the scroller.  It should not be confused the 0 passed to
-				-- SetProfileIndex() to use a USB memorycard which is a different stupid hardcoded number defined by the engine. D:
-				elseif index == 0 then
-					-- ScreenSelectProfile's Finish() method is hardcoded to assign DefaultProfileIDs
-					-- which will interfere with SL's notion of NOT requiring all players to use profiles.
-					-- If the player went out of their way to enable ScreenSelectProfile, they presumably want
-					-- to be able to pick, and picking (to me) means having an option for not-using-a-profile.
-					PREFSMAN:SetPreference("DefaultLocalProfileIDP1", "")
-					PREFSMAN:SetPreference("DefaultLocalProfileIDP2", "")
+					-- 0 here is my own stupid hardcoded number, defined over in PlayerFrame.lua for use with the "[Guest]" choice
+					-- In this case, 0 is the index of the choice in the scroller.  It should not be confused the 0 passed to
+					-- SetProfileIndex() to use a USB memorycard which is a different stupid hardcoded number defined by the engine. D:
+					elseif index == 0 then
+						-- ScreenSelectProfile's Finish() method is hardcoded to assign DefaultProfileIDs
+						-- which will interfere with SL's notion of NOT requiring all players to use profiles.
+						-- If the player went out of their way to enable ScreenSelectProfile, they presumably want
+						-- to be able to pick, and picking (to me) means having an option for not-using-a-profile.
+						PREFSMAN:SetPreference("DefaultLocalProfileIDP1", "")
+						PREFSMAN:SetPreference("DefaultLocalProfileIDP2", "")
 
-					-- Passing -3 to SetProfileIndex() will allow the player to play without a profile
-					SCREENMAN:GetTopScreen():SetProfileIndex(player, -3)
+						-- Passing -3 to SetProfileIndex() will allow the player to play without a profile
+						SCREENMAN:GetTopScreen():SetProfileIndex(player, -3)
+					end
 				end
 			end
 		end
@@ -215,6 +269,9 @@ local t = Def.ActorFrame {
 	-- various events can occur that require us to reassess what we're drawing
 	OnCommand=function(self) self:queuecommand('Update') end,
 	StorageDevicesChangedMessageCommand=function(self) self:queuecommand('Update') end,
+	ArcadePassScannedMessageCommand=function(self) self:playcommand('Update') end,
+	ArcadePassRejectedMessageCommand=function(self) self:playcommand('Update') end,
+	ArcadePassLoggedOutMessageCommand=function(self) self:playcommand('Update') end,
 	PlayerJoinedMessageCommand=function(self, params) self:playcommand('Update', {player=params.Player}) end,
 	PlayerUnjoinedMessageCommand=function(self, params) self:playcommand('Update', {player=params.Player}) end,
 	SelectedProfileMessageCommand=function(self, params)

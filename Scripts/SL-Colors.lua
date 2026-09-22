@@ -1,6 +1,12 @@
 ------------------------------------------------------------
 -- global functions related to colors in Simply Love
 
+-- Simply FullCombo pairs PLAYER_2 with the periwinkle end of the F/C letter
+-- gradient (the last entry in SL.Colors) so both sides read as one brand
+-- gradient against PLAYER_1's FullCombo pink.  Simply Love's stock offset
+-- (ActiveColorIndex - 2) would land PLAYER_2 on one of the logo-arrow colors.
+local FULLCOMBO_PLAYER_2_INDEX = 12
+
 function GetHexColor( n, decorative )
 	-- if we were passed nil or a non-number, return white
 	if n == nil or type(n) ~= "number" then return Color.White end
@@ -35,7 +41,7 @@ end
 
 function PlayerColor( pn, decorative )
 	if pn == PLAYER_1 then return GetHexColor(SL.Global.ActiveColorIndex, decorative) end
-	if pn == PLAYER_2 then return GetHexColor(SL.Global.ActiveColorIndex-2, decorative) end
+	if pn == PLAYER_2 then return GetHexColor(FULLCOMBO_PLAYER_2_INDEX, decorative) end
 	return Color.White
 end
 

@@ -188,34 +188,41 @@ SL = {
 
 	-- Colors that Simply Love's background can be
 	-- These colors are used for text on dark backgrounds and backgrounds containing dark text:
+	-- Simply FullCombo: taken from the FullCombo logo -- indices 1-2 and 4-9 are
+	-- the eight title arrows in logo order, index 3 is the pink arrow fill
+	-- (Simply Love's default accent index), and 10-12 are the F/C letter
+	-- gradient from its top (pale pink) to its bottom (periwinkle).
 	Colors = {
-		"#FF5D47",
-		"#FF577E",
-		"#FF47B3",
-		"#DD57FF",
-		"#8885ff",
-		"#3D94FF",
-		"#00B8CC",
-		"#5CE087",
-		"#AEFA44",
-		"#FFFF00",
-		"#FFBE00",
-		"#FF7D00",
+		"#FF5500", -- logo arrow 1 (orange)
+		"#FFBF00", -- logo arrow 2 (gold)
+		"#EE84B3", -- FullCombo pink (default color)
+		"#79E400", -- logo arrow 3 (green)
+		"#00E1B2", -- logo arrow 4 (teal)
+		"#0083FF", -- logo arrow 5 (blue)
+		"#5E00FF", -- logo arrow 6 (violet)
+		"#AB00FF", -- logo arrow 7 (purple)
+		"#ED00E0", -- logo arrow 8 (magenta)
+		"#E8D0E5", -- F/C letter gradient, top
+		"#D1C7E3", -- F/C letter gradient, middle
+		"#B1BEE1", -- F/C letter gradient, bottom
 	},
 	-- These are the original SL colors. They're used for decorative (non-text) elements, like the background hearts:
+	-- Simply FullCombo: the same brand set, but the last three are the deeper
+	-- end of the logo (the letter outline purple and the lower gradient stops)
+	-- so background shapes stay readable behind text.
 	DecorativeColors = {
-		"#FF3C23",
-		"#FF003C",
-		"#C1006F",
-		"#8200A1",
-		"#413AD0",
-		"#0073FF",
-		"#00ADC0",
-		"#5CE087",
-		"#AEFA44",
-		"#FFFF00",
-		"#FFBE00",
-		"#FF7D00"
+		"#FF5500", -- logo arrow 1 (orange)
+		"#FFBF00", -- logo arrow 2 (gold)
+		"#EE84B3", -- FullCombo pink (default color)
+		"#79E400", -- logo arrow 3 (green)
+		"#00E1B2", -- logo arrow 4 (teal)
+		"#0083FF", -- logo arrow 5 (blue)
+		"#5E00FF", -- logo arrow 6 (violet)
+		"#AB00FF", -- logo arrow 7 (purple)
+		"#ED00E0", -- logo arrow 8 (magenta)
+		"#8A73A5", -- F/C letter outline purple
+		"#D1C7E3", -- F/C letter gradient, middle
+		"#B1BEE1", -- F/C letter gradient, bottom
 	},
 	-- These judgment colors are used for text & numbers on dark backgrounds:
 	JudgmentColors = {

@@ -240,6 +240,7 @@ local function AddProfileEntries()
 
 	return {
 		{ {"NextPlease", "SwitchProfile"}, ThemePrefs.Get("AllowScreenSelectProfile") },
+		{ {"NextPlease", "LogOut"}, PREFSMAN:GetPreference("ArcadePassEnabled") },
 		{ {"SortBy", "PopularityP1"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_1) end },
 		{ {"SortBy", "RecentP1"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_1) end },
 		{ {"SortBy", "TopP1Grades"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_1) end },
@@ -410,6 +411,7 @@ local t = Def.ActorFrame {
 			-- Only show GoBack if we're in 3 key navigation mode, as it's redundant in 5 key.
 			{ { "", "GoBack" }, PREFSMAN:GetPreference("ThreeKeyNavigation") },
 			{ {"NextPlease", "SwitchProfile"}, ThemePrefs.Get("AllowScreenSelectProfile") },
+			{ {"NextPlease", "LogOut"}, PREFSMAN:GetPreference("ArcadePassEnabled") },
 			{ {"GrooveStats", "Leaderboard"}, function() return GAMESTATE:GetCurrentSong() ~= nil end },
 			{ {"WhereforeArtThou", "SongSearch"}, not GAMESTATE:IsCourseMode() and ThemePrefs.Get("KeyboardFeatures") },
 			{ {"ImLovinIt", "AddFavorite"}, function() return GAMESTATE:GetCurrentSong() ~= nil end},

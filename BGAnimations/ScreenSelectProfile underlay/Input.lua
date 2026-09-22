@@ -90,6 +90,14 @@ Handle.Start = function(event)
 
 		local other_player = event.PlayerNumber == PLAYER_1 and PLAYER_2 or PLAYER_1
 
+		-- An ArcadePass cabinet never populates the profile scrollers, so the
+		-- focus lookup can come back nil; treat a missing entry as [GUEST]
+		-- (index 0) instead of indexing nil.
+		local info_p1 = scrollers[PLAYER_1]:get_info_at_focus_pos()
+		local info_p2 = scrollers[PLAYER_2]:get_info_at_focus_pos()
+		local index_p1 = type(info_p1)=="table" and info_p1.index or 0
+		local index_p2 = type(info_p2)=="table" and info_p2.index or 0
+
 		-- we only bother checking scrollers to see if both players are
 		-- trying to choose the same profile if there are scrollers because
 		-- there are local profiles.  If there are no local profiles, there are
@@ -99,9 +107,9 @@ Handle.Start = function(event)
 			and #GAMESTATE:GetHumanPlayers() > 1 and not GAMESTATE:IsAnyHumanPlayerUsingMemoryCard()
 			-- and if a player is trying to select a profile the other has already selected
 			and readyPlayers[ToEnumShortString(other_player)] == true
-			and scrollers[PLAYER_1]:get_info_at_focus_pos().index == scrollers[PLAYER_2]:get_info_at_focus_pos().index
+			and index_p1 == index_p2
 			-- and that profile they are both trying to choose isn't [GUEST]
-			and scrollers[PLAYER_1]:get_info_at_focus_pos().index ~= 0 then
+			and index_p1 ~= 0 then
 			-- broadcast an InvalidChoice message to play the "Common invalid" sound
 			-- and "shake" the playerframe for the player that just pressed start
 			MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})

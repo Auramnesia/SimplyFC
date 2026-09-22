@@ -68,6 +68,12 @@ local function CreditsText( player )
 				end
 			end
 
+			-- ArcadePassProfileOverlay draws the loaded profile for joined sides,
+			-- so hide the credits text for them to avoid two competing names.
+			if PREFSMAN:GetPreference("ArcadePassEnabled") and GAMESTATE:IsHumanPlayer(player) then
+				bShow = false
+			end
+
 			self:visible( bShow )
 			self:diffuse(textColor)
 			self:shadowlength(shadowLength)

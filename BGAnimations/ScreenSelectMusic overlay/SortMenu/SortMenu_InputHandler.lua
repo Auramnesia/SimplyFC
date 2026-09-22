@@ -154,6 +154,11 @@ local input = function(event)
 					PROFILEMAN:SaveMachineProfile()
 
 					overlay:queuecommand("DirectInputToEngineForSelectProfile")
+				elseif focus.new_overlay == "LogOut" then
+					-- ArcadePass: release this player's pass (if any) and unjoin
+					-- them, then return input to the song wheel.
+					ArcadePass.LogOut(event.PlayerNumber)
+					overlay:queuecommand("DirectInputToEngine")
 				elseif focus.new_overlay == "AddFavorite" then
 					addOrRemoveFavorite(event.PlayerNumber)
 					-- Nudge the wheel a bit so that that the icon is correctly updated.

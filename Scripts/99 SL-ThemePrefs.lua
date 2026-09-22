@@ -16,8 +16,8 @@ end
 
 SL_CustomPrefs.Get = function()
 	 -- emojis are our lingua franca for the 21st century
-	local visualStyleChoices = { "❤", "↖", "🐻", "🦆", "😺", "🎃", "🌈", "⭐", "🤔", "🌀" }
-	local visualStyleValues  = { "Hearts", "Arrows", "Bears", "Ducks", "Cats", "Spooky", "Gay", "Stars", "Thonk", "Technique" }
+	local visualStyleChoices = { "❤", "↖", "🐻", "🦆", "😺", "🎃", "🌈", "⭐", "🤔", "🌀", "🏆" }
+	local visualStyleValues  = { "Hearts", "Arrows", "Bears", "Ducks", "Cats", "Spooky", "Gay", "Stars", "Thonk", "Technique", "FullCombo" }
 
 	local year = Year()
 	local month = MonthOfYear()+1
@@ -97,7 +97,7 @@ SL_CustomPrefs.Get = function()
 		},
 		PreferredStyle =
 		{
-			Default = "none",
+			Default = "versus",
 			Choices = {
 				THEME:GetString("ScreenSelectStyle", "None"),
 				THEME:GetString("ScreenSelectStyle", "Auto"),
@@ -109,7 +109,7 @@ SL_CustomPrefs.Get = function()
 		},
 		VisualStyle =
 		{
-			Default = "Technique",
+			Default = "FullCombo",
 			Choices = visualStyleChoices,
 			Values  = visualStyleValues
 		},
@@ -167,7 +167,7 @@ SL_CustomPrefs.Get = function()
 		-- the StepMania application is started.
 		SimplyLoveColor =
 		{
-			-- a nice pinkish-purple, by default
+			-- the FullCombo pink (see SL.Colors), by default
 			Default = 3,
 			Choices = { 1,2,3,4,5,6,7,8,9,10,11,12 },
 			Values  = { 1,2,3,4,5,6,7,8,9,10,11,12 }
@@ -253,19 +253,19 @@ SL_CustomPrefs.Get = function()
 		},
 		AllowScreenSelectColor =
 		{
-			Default = true,
+			Default = false,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
 			Values  = { true, false }
 		},
 		AllowScreenSelectPlayMode =
 		{
-			Default = true,
+			Default = false,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
 			Values  = { true, false }
 		},
 		AllowScreenSelectPlayMode2 =
 		{
-			Default = true,
+			Default = false,
 			Choices = { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
 			Values  = { true, false }
 		},
@@ -356,7 +356,7 @@ SL_CustomPrefs.Get = function()
 		},
 
 		QRLogin = {
-			Default = "Sometimes",
+			Default = "Never",
 			Choices = {
 				THEME:GetString("ThemePrefs", "Always"),
 				THEME:GetString("ThemePrefs", "Sometimes"),

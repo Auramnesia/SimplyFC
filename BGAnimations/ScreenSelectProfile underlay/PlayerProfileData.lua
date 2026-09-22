@@ -104,6 +104,15 @@ end
 
 local profile_data = {}
 
+-- ArcadePass cabinets must never enumerate or display local profiles before
+-- a card scan authorizes a player. The engine-side authorization gate remains
+-- authoritative; this only keeps names off the screen.
+-- This file loads before the screen becomes the top screen, so read the
+-- immutable preference directly instead of using a screen method.
+if PREFSMAN:GetPreference("ArcadePassEnabled") then
+	return profile_data
+end
+
 for i=1, PROFILEMAN:GetNumLocalProfiles() do
 
 	-- GetLocalProfileFromIndex() expects indices to start at 0

@@ -144,6 +144,20 @@ GetAuthor = function()
 end
 
 -- -----------------------------------------------------------------------
+-- read the display name from ThemeInfo.ini to display on ScreenTitleMenu
+-- (falls back to the theme folder name if ThemeInfo.ini has no DisplayName)
+
+GetThemeDisplayName = function()
+	local file = IniFile.ReadFile( THEME:GetCurrentThemeDirectory() .. "ThemeInfo.ini" )
+	if file then
+		if file.ThemeInfo and file.ThemeInfo.DisplayName then
+			return file.ThemeInfo.DisplayName
+		end
+	end
+	return THEME:GetCurThemeName()
+end
+
+-- -----------------------------------------------------------------------
 -- NOTE: This is the preferred way to check for RTT support, but we cannot rely on it to
 --   accurately tell us whether the current system atually supports RTT!
 --   Some players on Linux and [some version of] SM5.1-beta reported that DISPLAY:SupportsRenderToTexture()

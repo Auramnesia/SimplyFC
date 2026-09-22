@@ -185,7 +185,10 @@ return Def.ActorFrame{
 
 			-- Scroll to the current player profile, if any
 			if pos then
-				local curr_index = scroller:get_info_at_focus_pos().index
+				-- ArcadePass cabinets have no scroller entries to focus, so a
+				-- missing lookup must not break the screen.
+				local info = scroller:get_info_at_focus_pos()
+				local curr_index = type(info)=="table" and info.index or 0
 				scroller:scroll_by_amount(pos - curr_index)
 			else
 				local pn = ToEnumShortString(player)
@@ -258,7 +261,7 @@ return Def.ActorFrame{
 								self:align(0,0):zoomto(avatar_dim,avatar_dim):diffuse(color("#283239aa"))
 							end
 						},
-						LoadActor(THEME:GetPathG("", "_VisualStyles/".. ThemePrefs.Get("VisualStyle") .."/SelectColor"))..{
+						LoadActor(THEME:GetPathG("", "_VisualStyles/".. ThemePrefs.Get("VisualStyle") .."/SelectColor.png"))..{
 							InitCommand=function(self)
 								self:align(0,0):zoom(0.09):diffusealpha(0.9):xy(13, 8)
 								if ThemePrefs.Get("VisualStyle") == "SRPG10" then
@@ -401,5 +404,13 @@ return Def.ActorFrame{
 			self:y(160):zoom(1.35):shadowlength(ThemePrefs.Get("RainbowMode") and 0.5 or 0):cropright(1)
 		end,
 		OnCommand=function(self) self:sleep(0.2):smooth(0.2):cropright(0) end
+	},
+
+	-- ArcadePass status text; only visible when the engine reports ArcadePass mode
+	LoadFont("Common Normal")..{
+		Name='ArcadePassStatus',
+		InitCommand=function(self)
+			self:settext(""):y(150):zoom(0.85):shadowlength(1):visible(false):wrapwidthpixels(320)
+		end
 	}
 }

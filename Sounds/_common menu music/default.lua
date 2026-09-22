@@ -9,6 +9,7 @@ local songs = {
 	Stars  = "Shooting Star - faux VRC6 remix",
 	Thonk  = "Da Box of Kardboard Too (feat Naoki vs ZigZag) - TaroNuke Remix",
 	Technique = "Quaq",
+	FullCombo = "Quaq",
 	SRPG10  = "SRPG10"
 }
 

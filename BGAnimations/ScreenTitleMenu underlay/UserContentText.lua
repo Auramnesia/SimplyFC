@@ -32,9 +32,9 @@ end
 -- sometimes due to concern that an update will cause them to lose data, sometimes accidentally, etc.
 
 -- It is important to display the current theme's name to help users quickly assess what version of SL
--- they are using right now.  THEME:GetCurThemeName() provides the name of the theme folder from the
--- filesystem, so we'll show that.  It is guaranteed to be unique and users are likely to recognize it.
-local sl_name = THEME:GetCurThemeName()
+-- they are using right now.  Prefer ThemeInfo.ini's DisplayName (so rebranded forks show their own
+-- name), and fall back to THEME:GetCurThemeName() -- the name of the theme folder on the filesystem.
+local sl_name = GetThemeDisplayName()
 
 -- -----------------------------------------------------------------------
 -- ProductFamily() returns "StepMania"

@@ -54,8 +54,11 @@ local HandleStateChange = function(self, Player)
 			if profile_index > 0 then
 				local profile = PROFILEMAN:GetLocalProfileFromIndex(profile_index - 1)
 				local displayname = profile and profile:GetDisplayName() or ""
+				-- Administrator passes unlock the operator-only screens; say so
+				-- here so it is obvious which card is signed in.
+				local admin = ArcadePass.IsAdmin(Player) and " (ADMIN)" or ""
 				seltext:settext(displayname)
-				arcadepass_status:settext("ARCADEPASS ACCEPTED\n" .. displayname .. "\nPress START to continue")
+				arcadepass_status:settext("ARCADEPASS ACCEPTED" .. admin .. "\n" .. displayname .. "\nPress START to continue")
 			else
 				seltext:settext(THEME:GetString("ScreenSelectProfile", "GuestProfile"))
 				if profile_index == -3 then

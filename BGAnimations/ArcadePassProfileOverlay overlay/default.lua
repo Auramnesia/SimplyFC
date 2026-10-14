@@ -171,7 +171,10 @@ local t = Def.ActorFrame {
 				if name == "" then
 					name = "GUEST"
 				end
-				text = ToEnumShortString(pn) .. "  " .. name
+				-- Mark administrator passes so the cabinet's operator can see at
+				-- a glance which pass is signed in.
+				local admin = ArcadePass.IsAdmin(pn) and "  (ADMIN)" or ""
+				text = ToEnumShortString(pn) .. "  " .. name .. admin
 			end
 			if label:GetText() ~= text then
 				label:settext(text)

@@ -60,7 +60,13 @@ SelectMusicOrCourse = function()
 end
 
 Branch.AllowScreenSelectProfile = function()
-	if ThemePrefs.Get("AllowScreenSelectProfile") then
+	-- ArcadePass cabinets always show this screen: it is the card gate
+	-- ("SCAN ARCADEPASS or press START for guest"), and the local profile
+	-- scroller is hidden there while ArcadePass is on.  The stock theme pref
+	-- defaults to No ("should be No for public machines"), which on a cabinet
+	-- would take the player straight to song select without ever asking for a
+	-- card.  So ArcadePass overrides the pref.
+	if PREFSMAN:GetPreference("ArcadePassEnabled") or ThemePrefs.Get("AllowScreenSelectProfile") then
 		return "ScreenSelectProfile"
 	else
 		return Branch.AfterSelectProfile()

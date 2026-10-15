@@ -73,6 +73,19 @@ Branch.AllowScreenSelectProfile = function()
 	end
 end
 
+-- Operator-only screens (the settings/operator menu, the chart editor, quitting)
+-- are for administrators.  ArcadePass.Unrestricted() is true when ArcadePass is
+-- off -- which is the whole of Simply Love, so a desktop install is unaffected --
+-- or when an administrator's pass is signed in.  Otherwise the choice leads to
+-- the card gate instead, so an ordinary player cannot open it.
+Branch.OperatorOnly = function(screen)
+	if ArcadePass.Unrestricted() then
+		return screen
+	else
+		return "ScreenSelectProfile"
+	end
+end
+
 Branch.AfterSelectProfile = function()
 	-- If we only want to sometimes display QR Login, only do so if at least one
 	-- of the chosen profiles doesn't already have an API key saved.
@@ -231,6 +244,14 @@ Branch.SSMCancel = function()
 
 	if GAMESTATE:GetCurrentStageIndex() > 0 then
 		return Branch.AllowScreenEvalSummary()
+	end
+
+	-- Backing out of song select normally lands on the title menu, which carries
+	-- the operator entries (Edit Mode / Options / Exit).  On an ArcadePass
+	-- cabinet that is an administrator's screen, so without one the player
+	-- returns to the card gate instead.
+	if not ArcadePass.Unrestricted() then
+		return "ScreenSelectProfile"
 	end
 
 	return Branch.TitleMenu()

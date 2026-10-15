@@ -102,6 +102,9 @@ af[#af+1] = LoadActor("./Support.lua")
 -- -----------------------------------------------------------------------
 af[#af+1] = LoadActor("./ActiveOptionRowState.lua")
 -- -----------------------------------------------------------------------
+-- ArcadePass: bounce out of the operator menu unless an admin pass is in
+af[#af+1] = LoadActor("./AdminGate.lua")
+-- -----------------------------------------------------------------------
 
 -- background Quad for side pane
 af[#af+1] = Def.Quad{
